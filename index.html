@@ -205,7 +205,7 @@
                         <label class="text-xs text-gray-300 font-medium">Kapak Tipi</label>
                         <select id="kapak_tipi" class="w-full bg-dark-700 border border-dark-600 rounded-xl px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-indigo-500">
                             <option value="0">Düz Geçme Kapak</option>
-                            <option value="1">Pimli / Kilitli Kapak</option>
+                            <option value="1">Rugged Box (Menteşeli ve Klipsli)</option>
                             <option value="2">Sürgülü Kapak</option>
                         </select>
                     </div>
@@ -337,7 +337,6 @@
             controls.update();
         }
 
-        // 2D Rounded Rectangle Shape Generator for Extrusion
         function createRoundedRectShape(width, height, radius) {
             const shape = new THREE.Shape();
             const x = -width / 2;
@@ -377,10 +376,11 @@
 
             const matBox = new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.3 });
             const matLid = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 });
+            const matLatch = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.2 });
 
             const boxObj = new THREE.Group();
 
-            // 1. Sağlam Taban (Köşe Radüslü)
+            // 1. Sağlam Taban
             const tabanShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
             const tabanGeom = new THREE.ExtrudeGeometry(tabanShape, { depth: p.taban, bevelEnabled: false });
             tabanGeom.center();
@@ -389,7 +389,7 @@
             tabanMesh.position.set(0, p.taban / 2, 0);
             boxObj.add(tabanMesh);
 
-            // 2. Yan Duvarlar (İçi boşaltılmış extrude yapı, köşe radüslü)
+            // 2. Yan Duvarlar
             const outerShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
             const innerHoleRadius = Math.max(0.1, p.kose_r - p.duvar);
             const innerShape = createRoundedRectShape(p.ic_genislik, p.ic_derinlik, innerHoleRadius);
@@ -401,6 +401,17 @@
             duvarMesh.rotation.x = Math.PI / 2;
             duvarMesh.position.set(0, p.taban + p.ic_yukseklik / 2, 0);
             boxObj.add(duvarMesh);
+
+            // Rugged Box Dış Gövde Takviye Çıkıntıları (Ribs)
+            if (p.kapak_tipi === 1) {
+                const ribGeom = new THREE.BoxGeometry(dis_x + 0.6, 3, 1.5);
+                const rib1 = new THREE.Mesh(ribGeom, matBox);
+                rib1.position.set(0, p.taban + p.ic_yukseklik / 2, dis_y / 2);
+                boxObj.add(rib1);
+                const rib2 = new THREE.Mesh(ribGeom, matBox);
+                rib2.position.set(0, p.taban + p.ic_yukseklik / 2, -dis_y / 2);
+                boxObj.add(rib2);
+            }
 
             // Ara Bölmeler
             if (p.bolme_aktif && p.bolme_sayisi > 0) {
@@ -427,7 +438,7 @@
 
             boxGroup.add(boxObj);
 
-            // 3. KAPAK (Seçilen Kapak Tipine Göre Detaylı Model)
+            // 3. KAPAK VE KLİPSLER
             const kapakObj = new THREE.Group();
 
             if (p.kapak_tipi === 0) {
@@ -449,23 +460,36 @@
                 kapakObj.add(kulakMesh);
 
             } else if (p.kapak_tipi === 1) {
-                // Tip 1: Pimli / Kilitli Kapak
+                // Tip 1: Rugged Box (Menteşeli ve Klipsli Kilitli Stil)
                 const tablaShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
-                const tablaGeom = new THREE.ExtrudeGeometry(tablaShape, { depth: 2.5, bevelEnabled: false });
+                const tablaGeom = new THREE.ExtrudeGeometry(tablaShape, { depth: 3.0, bevelEnabled: false });
                 tablaGeom.center();
                 const tablaMesh = new THREE.Mesh(tablaGeom, matLid);
                 tablaMesh.rotation.x = Math.PI / 2;
-                tablaMesh.position.set(0, 1.25, 0);
+                tablaMesh.position.set(0, 1.5, 0);
                 kapakObj.add(tablaMesh);
 
-                const pinGeom = new THREE.BoxGeometry(6, 3, 3);
-                const pin1 = new THREE.Mesh(pinGeom, matLid);
-                pin1.position.set(0, 2.5, dis_y / 2 - 1.5);
-                kapakObj.add(pin1);
+                // Arka Menteşe Kulakları
+                const hingeGeom = new THREE.CylinderGeometry(2, 2, 8, 16);
+                const hinge1 = new THREE.Mesh(hingeGeom, matLid);
+                hinge1.rotation.z = Math.PI / 2;
+                hinge1.position.set(-dis_x / 4, 1.5, -dis_y / 2 - 1);
+                kapakObj.add(hinge1);
 
-                const pin2 = new THREE.Mesh(pinGeom, matLid);
-                pin2.position.set(0, 2.5, -dis_y / 2 + 1.5);
-                kapakObj.add(pin2);
+                const hinge2 = new THREE.Mesh(hingeGeom, matLid);
+                hinge2.rotation.z = Math.PI / 2;
+                hinge2.position.set(dis_x / 4, 1.5, -dis_y / 2 - 1);
+                kapakObj.add(hinge2);
+
+                // Ön Kilit Mandalları (Klipsler)
+                const latchGeom = new THREE.BoxGeometry(10, 8, 4);
+                const latch1 = new THREE.Mesh(latchGeom, matLatch);
+                latch1.position.set(-dis_x / 4, 1.5, dis_y / 2 + 2);
+                kapakObj.add(latch1);
+
+                const latch2 = new THREE.Mesh(latchGeom, matLatch);
+                latch2.position.set(dis_x / 4, 1.5, dis_y / 2 + 2);
+                kapakObj.add(latch2);
 
             } else {
                 // Tip 2: Sürgülü Kapak
