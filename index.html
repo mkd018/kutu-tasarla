@@ -344,26 +344,22 @@
             tabanMesh.position.set(0, p.taban / 2, 0);
             boxObj.add(tabanMesh);
 
-            // 2. Yan Duvarlar (Sol, Sağ, Ön, Arka duvarlar parça parça eklenerek kusursuz katı yapı oluşturulur)
-            // Sol Duvar
+            // 2. Yan Duvarlar
             const solGeom = new THREE.BoxGeometry(p.duvar, p.ic_yukseklik, dis_y);
             const solMesh = new THREE.Mesh(solGeom, matBox);
             solMesh.position.set(-dis_x/2 + p.duvar/2, p.taban + p.ic_yukseklik/2, 0);
             boxObj.add(solMesh);
 
-            // Sağ Duvar
             const sagGeom = new THREE.BoxGeometry(p.duvar, p.ic_yukseklik, dis_y);
             const sagMesh = new THREE.Mesh(sagGeom, matBox);
             sagMesh.position.set(dis_x/2 - p.duvar/2, p.taban + p.ic_yukseklik/2, 0);
             boxObj.add(sagMesh);
 
-            // Ön Duvar
             const onGeom = new THREE.BoxGeometry(p.ic_genislik, p.ic_yukseklik, p.duvar);
             const onMesh = new THREE.Mesh(onGeom, matBox);
             onMesh.position.set(0, p.taban + p.ic_yukseklik/2, dis_y/2 - p.duvar/2);
             boxObj.add(onMesh);
 
-            // Arka Duvar
             const arkaGeom = new THREE.BoxGeometry(p.ic_genislik, p.ic_yukseklik, p.duvar);
             const arkaMesh = new THREE.Mesh(arkaGeom, matBox);
             arkaMesh.position.set(0, p.taban + p.ic_yukseklik/2, -dis_y/2 + p.duvar/2);
@@ -394,12 +390,45 @@
 
             boxGroup.add(boxObj);
 
-            // Kapak
+            // 3. KAPAK (Seçilen Kapak Tipine Göre Dinamik Tasarım)
             const kapakObj = new THREE.Group();
-            const kapakGeom = new THREE.BoxGeometry(dis_x, 2.5, dis_y);
-            const kapakMesh = new THREE.Mesh(kapakGeom, matLid);
-            kapakMesh.position.set(0, 1.25, 0);
-            kapakObj.add(kapakMesh);
+
+            if (p.kapak_tipi === 0) {
+                // Tip 0: Düz Geçme Kapak (Üst tabla + oturtma kulakçığı)
+                const tablaGeom = new THREE.BoxGeometry(dis_x, 2.0, dis_y);
+                const tablaMesh = new THREE.Mesh(tablaGeom, matLid);
+                tablaMesh.position.set(0, 1.0, 0);
+                kapakObj.add(tablaMesh);
+
+                const kulakGeom = new THREE.BoxGeometry(p.ic_genislik - (p.tolerans * 2), 1.5, p.ic_derinlik - (p.tolerans * 2));
+                const kulakMesh = new THREE.Mesh(kulakGeom, matLid);
+                kulakMesh.position.set(0, 2.75, 0);
+                kapakObj.add(kulakMesh);
+
+            } else if (p.kapak_tipi === 1) {
+                // Tip 1: Pimli / Kilitli Kapak (Köşelerde kilit çıkıntıları olan yapı)
+                const tablaGeom = new THREE.BoxGeometry(dis_x, 2.5, dis_y);
+                const tablaMesh = new THREE.Mesh(tablaGeom, matLid);
+                tablaMesh.position.set(0, 1.25, 0);
+                kapakObj.add(tablaMesh);
+
+                // Kenar klipsleri
+                const klipsGeom = new THREE.BoxGeometry(4, 3, 2);
+                const klips1 = new THREE.Mesh(klipsGeom, matLid);
+                klips1.position.set(0, 2.5, dis_y / 2 - p.duvar / 2);
+                kapakObj.add(klips1);
+
+                const klips2 = new THREE.Mesh(klipsGeom, matLid);
+                klips2.position.set(0, 2.5, -dis_y / 2 + p.duvar / 2);
+                kapakObj.add(klips2);
+
+            } else {
+                // Tip 2: Sürgülü Kapak (Raylı geçiş için düz ve ince tabaka)
+                const surguGeom = new THREE.BoxGeometry(dis_x - 0.5, 3.0, dis_y - 0.5);
+                const surguMesh = new THREE.Mesh(surguGeom, matLid);
+                surguMesh.position.set(0, 1.5, 0);
+                kapakObj.add(surguMesh);
+            }
 
             kapakObj.position.set(dis_x + 25, 0, 0);
             boxGroup.add(kapakObj);
