@@ -29,20 +29,9 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom scrollbar for control panel */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #111827;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #374151;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4b5563;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
     </style>
 </head>
 <body class="bg-dark-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col">
@@ -50,10 +39,8 @@
     <!-- HEADER -->
     <header class="bg-dark-800 border-b border-dark-700 sticky top-0 z-50 px-4 py-3 shadow-md">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-            <!-- Brand / Logo -->
             <div class="flex items-center space-x-3">
                 <div class="bg-dark-900 border border-dark-600 p-2 rounded-xl flex items-center justify-center shadow-inner">
-                    <!-- DDVector Exact Logo Representation -->
                     <div class="flex items-center space-x-1">
                         <div class="relative w-7 h-7 flex items-center justify-center font-black text-white text-lg tracking-tighter bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-lg shadow">
                             D
@@ -73,9 +60,8 @@
                 </div>
             </div>
 
-            <!-- Actions -->
             <div class="flex items-center space-x-3">
-                <button onclick="resetCamera()" class="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-xs font-medium rounded-xl transition flex items-center gap-1.5 border border-dark-600 shadow-sm" title="Kamerayı Sıfırla">
+                <button onclick="resetCamera()" class="px-3 py-2 bg-dark-700 hover:bg-dark-600 text-gray-300 text-xs font-medium rounded-xl transition flex items-center gap-1.5 border border-dark-600 shadow-sm">
                     <i class="fa-solid fa-camera-rotate"></i>
                     <span class="hidden sm:inline">Kamerayı Sıfırla</span>
                 </button>
@@ -90,17 +76,14 @@
     <!-- MAIN CONTAINER -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col lg:flex-row gap-6">
 
-        <!-- 3D PREVIEW SECTION (Always visible at top on mobile, right side on desktop) -->
+        <!-- 3D PREVIEW SECTION -->
         <div class="w-full lg:w-3/5 flex flex-col gap-4">
             <div class="relative w-full h-[400px] lg:h-[calc(100vh-140px)] bg-dark-800 rounded-2xl border border-dark-700 shadow-2xl overflow-hidden flex flex-col">
-                <!-- Canvas Header Overlay -->
                 <div class="absolute top-3 left-3 z-10 bg-dark-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-dark-700/60 text-xs flex items-center gap-2 shadow">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span class="font-medium text-gray-200">Canlı 3D Önizleme</span>
                     <span class="text-gray-400 text-[10px] hidden sm:inline">| Döndür: Sürükle | Yakınlaştır: Tekerlek</span>
                 </div>
-
-                <!-- Three.js Canvas Container -->
                 <div id="canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
             </div>
         </div>
@@ -108,13 +91,12 @@
         <!-- CONTROLS PANEL -->
         <div class="w-full lg:w-2/5 flex flex-col gap-5 bg-dark-800/80 backdrop-blur-md p-5 rounded-2xl border border-dark-700 shadow-xl overflow-y-auto max-h-[calc(100vh-140px)]">
             
-            <!-- SECTION 1: Kutu İç Ölçüleri -->
+            <!-- SECTION 1 -->
             <div class="space-y-4">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2 border-b border-dark-700 pb-2">
                     <i class="fa-solid fa-ruler-combined"></i> Kutu İç Ölçüleri (mm)
                 </h2>
                 
-                <!-- İç Genişlik -->
                 <div class="space-y-1">
                     <div class="flex justify-between text-xs">
                         <span class="text-gray-300 font-medium">İç Genişlik (X):</span>
@@ -124,7 +106,6 @@
                            class="w-full accent-indigo-500 bg-dark-700 h-1.5 rounded-lg appearance-none cursor-pointer">
                 </div>
 
-                <!-- İç Derinlik -->
                 <div class="space-y-1">
                     <div class="flex justify-between text-xs">
                         <span class="text-gray-300 font-medium">İç Derinlik (Y):</span>
@@ -134,7 +115,6 @@
                            class="w-full accent-indigo-500 bg-dark-700 h-1.5 rounded-lg appearance-none cursor-pointer">
                 </div>
 
-                <!-- İç Yükseklik -->
                 <div class="space-y-1">
                     <div class="flex justify-between text-xs">
                         <span class="text-gray-300 font-medium">İç Yükseklik (Z):</span>
@@ -145,14 +125,13 @@
                 </div>
             </div>
 
-            <!-- SECTION 2: Duvar ve Köşe Yapısı -->
+            <!-- SECTION 2 -->
             <div class="space-y-4">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2 border-b border-dark-700 pb-2">
                     <i class="fa-solid fa-cube"></i> Duvar ve Köşe Yapısı
                 </h2>
                 
                 <div class="grid grid-cols-2 gap-4">
-                    <!-- Duvar Kalınlığı -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-gray-300 font-medium">Duvar:</span>
@@ -162,7 +141,6 @@
                                class="w-full accent-indigo-500 bg-dark-700 h-1.5 rounded-lg appearance-none cursor-pointer">
                     </div>
 
-                    <!-- Taban Kalınlığı -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-gray-300 font-medium">Taban:</span>
@@ -172,19 +150,9 @@
                                class="w-full accent-indigo-500 bg-dark-700 h-1.5 rounded-lg appearance-none cursor-pointer">
                     </div>
                 </div>
-
-                <!-- Köşe Radüsü -->
-                <div class="space-y-1">
-                    <div class="flex justify-between text-xs">
-                        <span class="text-gray-300 font-medium">Köşe Radüsü (Yumuşatma):</span>
-                        <span id="val-kose-r" class="font-bold text-indigo-300">4 mm</span>
-                    </div>
-                    <input type="range" id="kose_r" min="0" max="15" value="4" step="1" 
-                           class="w-full accent-indigo-500 bg-dark-700 h-1.5 rounded-lg appearance-none cursor-pointer">
-                </div>
             </div>
 
-            <!-- SECTION 3: Ara Bölmeler -->
+            <!-- SECTION 3 -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between border-b border-dark-700 pb-2">
                     <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
@@ -198,7 +166,6 @@
 
                 <div id="bolme-controls" class="space-y-3">
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- Yön -->
                         <div class="space-y-1">
                             <label class="text-xs text-gray-300 font-medium">Yön</label>
                             <select id="bolme_yonu" class="w-full bg-dark-700 border border-dark-600 rounded-xl px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-indigo-500">
@@ -206,7 +173,6 @@
                                 <option value="Y">Y Eksenli (Dikey)</option>
                             </select>
                         </div>
-                        <!-- Adet -->
                         <div class="space-y-1">
                             <div class="flex justify-between text-xs">
                                 <span class="text-gray-300 font-medium">Adet:</span>
@@ -219,14 +185,13 @@
                 </div>
             </div>
 
-            <!-- SECTION 4: Kapak ve Tolerans -->
+            <!-- SECTION 4 -->
             <div class="space-y-4">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2 border-b border-dark-700 pb-2">
                     <i class="fa-solid fa-box-open"></i> Kapak ve Montaj
                 </h2>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <!-- Kapak Tipi -->
                     <div class="space-y-1">
                         <label class="text-xs text-gray-300 font-medium">Kapak Tipi</label>
                         <select id="kapak_tipi" class="w-full bg-dark-700 border border-dark-600 rounded-xl px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-indigo-500">
@@ -235,7 +200,6 @@
                             <option value="2">Sürgülü Kapak</option>
                         </select>
                     </div>
-                    <!-- Tolerans -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-gray-300 font-medium">Tolerans:</span>
@@ -261,7 +225,6 @@
         let scene, camera, renderer, controls;
         let boxGroup;
 
-        // Parametreleri DOM'dan okuyan yardımcı nesne
         function getParams() {
             return {
                 ic_genislik: parseFloat(document.getElementById('ic_genislik').value),
@@ -269,7 +232,6 @@
                 ic_yukseklik: parseFloat(document.getElementById('ic_yukseklik').value),
                 duvar: parseFloat(document.getElementById('duvar').value),
                 taban: parseFloat(document.getElementById('taban').value),
-                kose_r: parseFloat(document.getElementById('kose_r').value),
                 bolme_aktif: document.getElementById('bolme_aktif').checked,
                 bolme_yonu: document.getElementById('bolme_yonu').value,
                 bolme_sayisi: parseInt(document.getElementById('bolme_sayisi').value),
@@ -286,7 +248,6 @@
             document.getElementById('val-ic-yukseklik').innerText = p.ic_yukseklik + ' mm';
             document.getElementById('val-duvar').innerText = p.duvar + ' mm';
             document.getElementById('val-taban').innerText = p.taban + ' mm';
-            document.getElementById('val-kose_r').innerText = p.kose_r + ' mm';
             document.getElementById('val-bolme-sayisi').innerText = p.bolme_sayisi;
             document.getElementById('val-tolerans').innerText = p.tolerans + ' mm';
 
@@ -306,26 +267,19 @@
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
             container.appendChild(renderer.domElement);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
 
-            // Aydınlatma
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambientLight);
 
             const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
             dirLight1.position.set(200, 300, 200);
             scene.add(dirLight1);
 
-            const dirLight2 = new THREE.DirectionalLight(0x818cf8, 0.4);
-            dirLight2.position.set(-200, -100, -200);
-            scene.add(dirLight2);
-
-            // Zemin Izgarası
             const gridHelper = new THREE.GridHelper(300, 30, 0x374151, 0x1f2937);
             gridHelper.position.y = -0.1;
             scene.add(gridHelper);
@@ -335,7 +289,6 @@
 
             window.addEventListener('resize', onWindowResize);
             
-            // Event Listeners
             const inputs = document.querySelectorAll('input, select');
             inputs.forEach(input => {
                 input.addEventListener('input', () => {
@@ -344,6 +297,7 @@
                 });
             });
 
+            updateLabels();
             rebuildModel();
             animate();
         }
@@ -368,33 +322,6 @@
             controls.update();
         }
 
-        // --- 2D SHAPE GENERATORS FOR 3D EXTRUSION ---
-        function createRoundedRectShape(width, height, radius) {
-            const shape = new THREE.Shape();
-            const x = 0, y = 0;
-            const r = Math.min(radius, width / 2, height / 2);
-
-            if (r <= 0) {
-                shape.moveTo(x, y);
-                shape.lineTo(x + width, y);
-                shape.lineTo(x + width, y + height);
-                shape.lineTo(x, y + height);
-                shape.closePath();
-            } else {
-                shape.moveTo(x + r, y);
-                shape.lineTo(x + width - r, y);
-                shape.quadraticCurveTo(x + width, y, x + width, y + r);
-                shape.lineTo(x + width, y + height - r);
-                shape.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-                shape.lineTo(x + r, y + height);
-                shape.quadraticCurveTo(x, y + height, x, y + height - r);
-                shape.lineTo(x, y + r);
-                shape.quadraticCurveTo(x, y, x + r, y);
-                shape.closePath();
-            }
-            return shape;
-        }
-
         function rebuildModel() {
             while(boxGroup.children.length > 0){ 
                 boxGroup.remove(boxGroup.children[0]); 
@@ -406,140 +333,88 @@
             const dis_y = p.ic_derinlik + (p.duvar * 2);
             const dis_z = p.ic_yukseklik + p.taban;
 
-            // Malzemeler
-            const matBox = new THREE.MeshStandardMaterial({ 
-                color: 0x4f46e5, 
-                roughness: 0.3, 
-                metalness: 0.1 
-            });
-            const matLid = new THREE.MeshStandardMaterial({ 
-                color: 0x38bdf8, 
-                roughness: 0.4, 
-                metalness: 0.1 
-            });
+            const matBox = new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.3 });
+            const matLid = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 });
 
-            // 1. KUTU GÖVDESİ (CSG / Difference yerine Solid Taban + Hollow Extrusion kombinasyonu ile tam tabanlı yapı)
-            const boxGroupObj = new THREE.Group();
+            const boxObj = new THREE.Group();
 
-            // Alt Taban (Tamamen kapalı, deliksiz taban)
-            const tabanShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
-            const tabanGeom = new THREE.ExtrudeGeometry(tabanShape, { depth: p.taban, bevelEnabled: false });
-            tabanGeom.center();
+            // 1. Sağlam Taban
+            const tabanGeom = new THREE.BoxGeometry(dis_x, p.taban, dis_y);
             const tabanMesh = new THREE.Mesh(tabanGeom, matBox);
-            tabanMesh.rotation.x = Math.PI / 2;
             tabanMesh.position.set(0, p.taban / 2, 0);
-            boxGroupObj.add(tabanMesh);
+            boxObj.add(tabanMesh);
 
-            // Yan Duvarlar (Hollow Extrusion)
-            const outerShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
-            const innerHoleRadius = Math.max(0.1, p.kose_r - p.duvar);
-            const innerShape = createRoundedRectShape(p.ic_genislik, p.ic_derinlik, innerHoleRadius);
-            outerShape.holes.push(innerShape);
+            // 2. Yan Duvarlar (Sol, Sağ, Ön, Arka duvarlar parça parça eklenerek kusursuz katı yapı oluşturulur)
+            // Sol Duvar
+            const solGeom = new THREE.BoxGeometry(p.duvar, p.ic_yukseklik, dis_y);
+            const solMesh = new THREE.Mesh(solGeom, matBox);
+            solMesh.position.set(-dis_x/2 + p.duvar/2, p.taban + p.ic_yukseklik/2, 0);
+            boxObj.add(solMesh);
 
-            const duvarGeom = new THREE.ExtrudeGeometry(outerShape, { depth: p.ic_yukseklik, bevelEnabled: false });
-            duvarGeom.center();
-            const duvarMesh = new THREE.Mesh(duvarGeom, matBox);
-            duvarMesh.rotation.x = Math.PI / 2;
-            duvarMesh.position.set(0, p.taban + p.ic_yukseklik / 2, 0);
-            boxGroupObj.add(duvarMesh);
+            // Sağ Duvar
+            const sagGeom = new THREE.BoxGeometry(p.duvar, p.ic_yukseklik, dis_y);
+            const sagMesh = new THREE.Mesh(sagGeom, matBox);
+            sagMesh.position.set(dis_x/2 - p.duvar/2, p.taban + p.ic_yukseklik/2, 0);
+            boxObj.add(sagMesh);
 
-            // Kapak Dudak Payı (Oturma Yuvası)
-            if (p.kapak_tipi == 0 || p.kapak_tipi == 1) {
-                const rimOuter = createRoundedRectShape(p.ic_genislik + p.tolerans * 2, p.ic_derinlik + p.tolerans * 2, Math.max(0.1, innerHoleRadius - p.tolerans));
-                const rimInner = createRoundedRectShape(p.ic_genislik - p.duvar * 0.5, p.ic_derinlik - p.duvar * 0.5, Math.max(0.1, innerHoleRadius - p.duvar));
-                rimOuter.holes.push(rimInner);
-                
-                const rimGeom = new THREE.ExtrudeGeometry(rimOuter, { depth: 1.5, bevelEnabled: false });
-                rimGeom.center();
-                const rimMesh = new THREE.Mesh(rimGeom, matBox);
-                rimMesh.rotation.x = Math.PI / 2;
-                rimMesh.position.set(0, dis_z - 0.75, 0);
-                boxGroupObj.add(rimMesh);
-            }
+            // Ön Duvar
+            const onGeom = new THREE.BoxGeometry(p.ic_genislik, p.ic_yukseklik, p.duvar);
+            const onMesh = new THREE.Mesh(onGeom, matBox);
+            onMesh.position.set(0, p.taban + p.ic_yukseklik/2, dis_y/2 - p.duvar/2);
+            boxObj.add(onMesh);
+
+            // Arka Duvar
+            const arkaGeom = new THREE.BoxGeometry(p.ic_genislik, p.ic_yukseklik, p.duvar);
+            const arkaMesh = new THREE.Mesh(arkaGeom, matBox);
+            arkaMesh.position.set(0, p.taban + p.ic_yukseklik/2, -dis_y/2 + p.duvar/2);
+            boxObj.add(arkaMesh);
 
             // Ara Bölmeler
             if (p.bolme_aktif && p.bolme_sayisi > 0) {
-                const bolmeMat = matBox;
                 if (p.bolme_yonu === "X") {
                     const adim_y = p.ic_derinlik / (p.bolme_sayisi + 1);
                     for (let i = 1; i <= p.bolme_sayisi; i++) {
-                        const bGeom = new THREE.BoxGeometry(p.ic_genislik, p.bolme_kalinligi, p.ic_yukseklik);
-                        const bMesh = new THREE.Mesh(bGeom, bolmeMat);
-                        const posY = -p.ic_derinlik / 2 + adim_y * i;
-                        bMesh.position.set(0, p.taban + p.ic_yukseklik / 2, posY);
-                        boxGroupObj.add(bMesh);
+                        const bGeom = new THREE.BoxGeometry(p.ic_genislik, p.ic_yukseklik, p.bolme_kalinligi);
+                        const bMesh = new THREE.Mesh(bGeom, matBox);
+                        const posZ = -p.ic_derinlik / 2 + adim_y * i;
+                        bMesh.position.set(0, p.taban + p.ic_yukseklik / 2, posZ);
+                        boxObj.add(bMesh);
                     }
                 } else {
                     const adim_x = p.ic_genislik / (p.bolme_sayisi + 1);
                     for (let i = 1; i <= p.bolme_sayisi; i++) {
-                        const bGeom = new THREE.BoxGeometry(p.bolme_kalinligi, p.ic_derinlik, p.ic_yukseklik);
-                        const bMesh = new THREE.Mesh(bGeom, bolmeMat);
+                        const bGeom = new THREE.BoxGeometry(p.bolme_kalinligi, p.ic_yukseklik, p.ic_derinlik);
+                        const bMesh = new THREE.Mesh(bGeom, matBox);
                         const posX = -p.ic_genislik / 2 + adim_x * i;
                         bMesh.position.set(posX, p.taban + p.ic_yukseklik / 2, 0);
-                        boxGroupObj.add(bMesh);
+                        boxObj.add(bMesh);
                     }
                 }
             }
 
-            boxGroup.add(boxGroupObj);
+            boxGroup.add(boxObj);
 
-            // 2. KAPAK (Yanda veya üstte konumlandırılmış)
-            const kapakGroupObj = new THREE.Group();
-            const kapakKalinligi = 2.5;
+            // Kapak
+            const kapakObj = new THREE.Group();
+            const kapakGeom = new THREE.BoxGeometry(dis_x, 2.5, dis_y);
+            const kapakMesh = new THREE.Mesh(kapakGeom, matLid);
+            kapakMesh.position.set(0, 1.25, 0);
+            kapakObj.add(kapakMesh);
 
-            if (p.kapak_tipi == 0 || p.kapak_tipi == 1) {
-                // Ana Kapak Tabla
-                const kapakShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
-                const kapakGeom = new THREE.ExtrudeGeometry(kapakShape, { depth: kapakKalinligi - 0.5, bevelEnabled: false });
-                kapakGeom.center();
-                const kapakMesh = new THREE.Mesh(kapakGeom, matLid);
-                kapakMesh.rotation.x = Math.PI / 2;
-                kapakMesh.position.set(0, (kapakKalinligi - 0.5) / 2, 0);
-                kapakGroupObj.add(kapakMesh);
-
-                // İç Geçme Kulak
-                const kulakShape = createRoundedRectShape(p.ic_genislik - (p.tolerans * 2), p.ic_derinlik - (p.tolerans * 2), Math.max(0.1, innerHoleRadius - p.tolerans));
-                const kulakGeom = new THREE.ExtrudeGeometry(kulakShape, { depth: 1.5, bevelEnabled: false });
-                kulakGeom.center();
-                const kulakMesh = new THREE.Mesh(kulakGeom, matLid);
-                kulakMesh.rotation.x = Math.PI / 2;
-                kulakMesh.position.set(0, kapakKalinligi + 0.75, 0);
-                kapakGroupObj.add(kulakMesh);
-            } else {
-                // Sürgülü Kapak
-                const surguShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
-                const surguGeom = new THREE.ExtrudeGeometry(surguShape, { depth: kapakKalinligi, bevelEnabled: false });
-                surguGeom.center();
-                const surguMesh = new THREE.Mesh(surguGeom, matLid);
-                surguMesh.rotation.x = Math.PI / 2;
-                surguMesh.position.set(0, kapakKalinligi / 2, 0);
-                kapakGroupObj.add(surguMesh);
-            }
-
-            // Kapağı kutunun yanına yerleştir (baskıya hazır görünüm)
-            kapakGroupObj.position.set(dis_x + 20, 0, 0);
-            boxGroup.add(kapakGroupObj);
+            kapakObj.position.set(dis_x + 25, 0, 0);
+            boxGroup.add(kapakObj);
         }
 
-        // --- SIMPLE STL EXPORTER ---
         function exportSTL() {
             let stlString = "solid ParametricBox\n";
-
             boxGroup.traverse((child) => {
                 if (child.isMesh && child.geometry) {
                     const geometry = child.geometry.clone();
                     geometry.applyMatrix4(child.matrixWorld);
-                    
                     const positionAttr = geometry.attributes.position;
                     const indexAttr = geometry.index;
 
-                    const getVertex = (index) => {
-                        return new THREE.Vector3(
-                            positionAttr.getX(index),
-                            positionAttr.getY(index),
-                            positionAttr.getZ(index)
-                        );
-                    };
+                    const getVertex = (index) => new THREE.Vector3(positionAttr.getX(index), positionAttr.getY(index), positionAttr.getZ(index));
 
                     if (indexAttr) {
                         for (let i = 0; i < indexAttr.count; i += 3) {
@@ -547,7 +422,6 @@
                             const b = getVertex(indexAttr.getX(i + 1));
                             const c = getVertex(indexAttr.getX(i + 2));
 
-                            // Normal hesaplama
                             const cb = new THREE.Vector3().subVectors(c, b);
                             const ab = new THREE.Vector3().subVectors(a, b);
                             cb.cross(ab).normalize();
@@ -563,7 +437,6 @@
                     }
                 }
             });
-
             stlString += "endsolid ParametricBox\n";
 
             const blob = new Blob([stlString], { type: 'text/plain' });
@@ -574,7 +447,6 @@
         }
 
         window.onload = () => {
-            updateLabels();
             init3D();
         };
     </script>
