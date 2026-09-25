@@ -150,6 +150,15 @@
                                class="w-full accent-indigo-500 bg-dark-700 h-1.5 rounded-lg appearance-none cursor-pointer">
                     </div>
                 </div>
+
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-gray-300 font-medium">Köşe Radüsü (Yumuşatma):</span>
+                        <span id="val-kose-r" class="font-bold text-indigo-300">4 mm</span>
+                    </div>
+                    <input type="range" id="kose_r" min="0" max="15" value="4" step="1" 
+                           class="w-full accent-indigo-500 bg-dark-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+                </div>
             </div>
 
             <!-- SECTION 3 -->
@@ -232,6 +241,7 @@
                 ic_yukseklik: parseFloat(document.getElementById('ic_yukseklik').value),
                 duvar: parseFloat(document.getElementById('duvar').value),
                 taban: parseFloat(document.getElementById('taban').value),
+                kose_r: parseFloat(document.getElementById('kose_r').value),
                 bolme_aktif: document.getElementById('bolme_aktif').checked,
                 bolme_yonu: document.getElementById('bolme_yonu').value,
                 bolme_sayisi: parseInt(document.getElementById('bolme_sayisi').value),
@@ -248,6 +258,7 @@
             document.getElementById('val-ic-yukseklik').innerText = p.ic_yukseklik + ' mm';
             document.getElementById('val-duvar').innerText = p.duvar + ' mm';
             document.getElementById('val-taban').innerText = p.taban + ' mm';
+            document.getElementById('val-kose_r').innerText = p.kose_r + ' mm';
             document.getElementById('val-bolme-sayisi').innerText = p.bolme_sayisi;
             document.getElementById('val-tolerans').innerText = p.tolerans + ' mm';
 
@@ -295,6 +306,10 @@
                     updateLabels();
                     rebuildModel();
                 });
+                input.addEventListener('change', () => {
+                    updateLabels();
+                    rebuildModel();
+                });
             });
 
             updateLabels();
@@ -322,6 +337,34 @@
             controls.update();
         }
 
+        // 2D Rounded Rectangle Shape Generator for Extrusion
+        function createRoundedRectShape(width, height, radius) {
+            const shape = new THREE.Shape();
+            const x = -width / 2;
+            const y = -height / 2;
+            const r = Math.min(radius, width / 2, height / 2);
+
+            if (r <= 0) {
+                shape.moveTo(x, y);
+                shape.lineTo(x + width, y);
+                shape.lineTo(x + width, y + height);
+                shape.lineTo(x, y + height);
+                shape.closePath();
+            } else {
+                shape.moveTo(x + r, y);
+                shape.lineTo(x + width - r, y);
+                shape.quadraticCurveTo(x + width, y, x + width, y + r);
+                shape.lineTo(x + width, y + height - r);
+                shape.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+                shape.lineTo(x + r, y + height);
+                shape.quadraticCurveTo(x, y + height, x, y + height - r);
+                shape.lineTo(x, y + r);
+                shape.quadraticCurveTo(x, y, x + r, y);
+                shape.closePath();
+            }
+            return shape;
+        }
+
         function rebuildModel() {
             while(boxGroup.children.length > 0){ 
                 boxGroup.remove(boxGroup.children[0]); 
@@ -331,39 +374,33 @@
 
             const dis_x = p.ic_genislik + (p.duvar * 2);
             const dis_y = p.ic_derinlik + (p.duvar * 2);
-            const dis_z = p.ic_yukseklik + p.taban;
 
             const matBox = new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.3 });
             const matLid = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.4 });
 
             const boxObj = new THREE.Group();
 
-            // 1. Sağlam Taban
-            const tabanGeom = new THREE.BoxGeometry(dis_x, p.taban, dis_y);
+            // 1. Sağlam Taban (Köşe Radüslü)
+            const tabanShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
+            const tabanGeom = new THREE.ExtrudeGeometry(tabanShape, { depth: p.taban, bevelEnabled: false });
+            tabanGeom.center();
             const tabanMesh = new THREE.Mesh(tabanGeom, matBox);
+            tabanMesh.rotation.x = Math.PI / 2;
             tabanMesh.position.set(0, p.taban / 2, 0);
             boxObj.add(tabanMesh);
 
-            // 2. Yan Duvarlar
-            const solGeom = new THREE.BoxGeometry(p.duvar, p.ic_yukseklik, dis_y);
-            const solMesh = new THREE.Mesh(solGeom, matBox);
-            solMesh.position.set(-dis_x/2 + p.duvar/2, p.taban + p.ic_yukseklik/2, 0);
-            boxObj.add(solMesh);
+            // 2. Yan Duvarlar (İçi boşaltılmış extrude yapı, köşe radüslü)
+            const outerShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
+            const innerHoleRadius = Math.max(0.1, p.kose_r - p.duvar);
+            const innerShape = createRoundedRectShape(p.ic_genislik, p.ic_derinlik, innerHoleRadius);
+            outerShape.holes.push(innerShape);
 
-            const sagGeom = new THREE.BoxGeometry(p.duvar, p.ic_yukseklik, dis_y);
-            const sagMesh = new THREE.Mesh(sagGeom, matBox);
-            sagMesh.position.set(dis_x/2 - p.duvar/2, p.taban + p.ic_yukseklik/2, 0);
-            boxObj.add(sagMesh);
-
-            const onGeom = new THREE.BoxGeometry(p.ic_genislik, p.ic_yukseklik, p.duvar);
-            const onMesh = new THREE.Mesh(onGeom, matBox);
-            onMesh.position.set(0, p.taban + p.ic_yukseklik/2, dis_y/2 - p.duvar/2);
-            boxObj.add(onMesh);
-
-            const arkaGeom = new THREE.BoxGeometry(p.ic_genislik, p.ic_yukseklik, p.duvar);
-            const arkaMesh = new THREE.Mesh(arkaGeom, matBox);
-            arkaMesh.position.set(0, p.taban + p.ic_yukseklik/2, -dis_y/2 + p.duvar/2);
-            boxObj.add(arkaMesh);
+            const duvarGeom = new THREE.ExtrudeGeometry(outerShape, { depth: p.ic_yukseklik, bevelEnabled: false });
+            duvarGeom.center();
+            const duvarMesh = new THREE.Mesh(duvarGeom, matBox);
+            duvarMesh.rotation.x = Math.PI / 2;
+            duvarMesh.position.set(0, p.taban + p.ic_yukseklik / 2, 0);
+            boxObj.add(duvarMesh);
 
             // Ara Bölmeler
             if (p.bolme_aktif && p.bolme_sayisi > 0) {
@@ -390,42 +427,53 @@
 
             boxGroup.add(boxObj);
 
-            // 3. KAPAK (Seçilen Kapak Tipine Göre Dinamik Tasarım)
+            // 3. KAPAK (Seçilen Kapak Tipine Göre Detaylı Model)
             const kapakObj = new THREE.Group();
 
             if (p.kapak_tipi === 0) {
-                // Tip 0: Düz Geçme Kapak (Üst tabla + oturtma kulakçığı)
-                const tablaGeom = new THREE.BoxGeometry(dis_x, 2.0, dis_y);
+                // Tip 0: Düz Geçme Kapak
+                const tablaShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
+                const tablaGeom = new THREE.ExtrudeGeometry(tablaShape, { depth: 2.0, bevelEnabled: false });
+                tablaGeom.center();
                 const tablaMesh = new THREE.Mesh(tablaGeom, matLid);
+                tablaMesh.rotation.x = Math.PI / 2;
                 tablaMesh.position.set(0, 1.0, 0);
                 kapakObj.add(tablaMesh);
 
-                const kulakGeom = new THREE.BoxGeometry(p.ic_genislik - (p.tolerans * 2), 1.5, p.ic_derinlik - (p.tolerans * 2));
+                const kulakShape = createRoundedRectShape(p.ic_genislik - (p.tolerans * 2), p.ic_derinlik - (p.tolerans * 2), Math.max(0.1, innerHoleRadius - p.tolerans));
+                const kulakGeom = new THREE.ExtrudeGeometry(kulakShape, { depth: 1.5, bevelEnabled: false });
+                kulakGeom.center();
                 const kulakMesh = new THREE.Mesh(kulakGeom, matLid);
+                kulakMesh.rotation.x = Math.PI / 2;
                 kulakMesh.position.set(0, 2.75, 0);
                 kapakObj.add(kulakMesh);
 
             } else if (p.kapak_tipi === 1) {
-                // Tip 1: Pimli / Kilitli Kapak (Köşelerde kilit çıkıntıları olan yapı)
-                const tablaGeom = new THREE.BoxGeometry(dis_x, 2.5, dis_y);
+                // Tip 1: Pimli / Kilitli Kapak
+                const tablaShape = createRoundedRectShape(dis_x, dis_y, p.kose_r);
+                const tablaGeom = new THREE.ExtrudeGeometry(tablaShape, { depth: 2.5, bevelEnabled: false });
+                tablaGeom.center();
                 const tablaMesh = new THREE.Mesh(tablaGeom, matLid);
+                tablaMesh.rotation.x = Math.PI / 2;
                 tablaMesh.position.set(0, 1.25, 0);
                 kapakObj.add(tablaMesh);
 
-                // Kenar klipsleri
-                const klipsGeom = new THREE.BoxGeometry(4, 3, 2);
-                const klips1 = new THREE.Mesh(klipsGeom, matLid);
-                klips1.position.set(0, 2.5, dis_y / 2 - p.duvar / 2);
-                kapakObj.add(klips1);
+                const pinGeom = new THREE.BoxGeometry(6, 3, 3);
+                const pin1 = new THREE.Mesh(pinGeom, matLid);
+                pin1.position.set(0, 2.5, dis_y / 2 - 1.5);
+                kapakObj.add(pin1);
 
-                const klips2 = new THREE.Mesh(klipsGeom, matLid);
-                klips2.position.set(0, 2.5, -dis_y / 2 + p.duvar / 2);
-                kapakObj.add(klips2);
+                const pin2 = new THREE.Mesh(pinGeom, matLid);
+                pin2.position.set(0, 2.5, -dis_y / 2 + 1.5);
+                kapakObj.add(pin2);
 
             } else {
-                // Tip 2: Sürgülü Kapak (Raylı geçiş için düz ve ince tabaka)
-                const surguGeom = new THREE.BoxGeometry(dis_x - 0.5, 3.0, dis_y - 0.5);
+                // Tip 2: Sürgülü Kapak
+                const surguShape = createRoundedRectShape(dis_x - 0.5, dis_y - 0.5, p.kose_r);
+                const surguGeom = new THREE.ExtrudeGeometry(surguShape, { depth: 3.0, bevelEnabled: false });
+                surguGeom.center();
                 const surguMesh = new THREE.Mesh(surguGeom, matLid);
+                surguMesh.rotation.x = Math.PI / 2;
                 surguMesh.position.set(0, 1.5, 0);
                 kapakObj.add(surguMesh);
             }
